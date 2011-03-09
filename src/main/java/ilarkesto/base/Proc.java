@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package ilarkesto.base;
 
 import ilarkesto.core.logging.Log;
@@ -30,11 +44,12 @@ public final class Proc {
 	 * Starts the process and waits until it ends. Returns output when return code is 0. Otherwise throws
 	 * Exception.
 	 */
-	public static String execute(String command, String... parameters) {
+	public static String execute(String command, String... parameters) throws UnexpectedReturnCodeException {
 		return execute(null, command, parameters);
 	}
 
-	public static String execute(File workDir, String command, String... parameters) {
+	public static String execute(File workDir, String command, String... parameters)
+			throws UnexpectedReturnCodeException {
 		Proc proc = new Proc(command);
 		proc.setWorkingDir(workDir);
 		for (String parameter : parameters) {
@@ -47,11 +62,11 @@ public final class Proc {
 	 * Starts the process and waits until it ends. Returns output when return code is 0. Otherwise throws
 	 * Exception.
 	 */
-	public String execute() {
+	public String execute() throws UnexpectedReturnCodeException {
 		return execute(0);
 	}
 
-	public String execute(int... acceptableReturnCodes) {
+	public String execute(int... acceptableReturnCodes) throws UnexpectedReturnCodeException {
 		start();
 		int rc = getReturnCode();
 		boolean rcOk = false;
@@ -69,7 +84,7 @@ public final class Proc {
 					cmdline.append(" ").append(parameter);
 				}
 			}
-			throw new RuntimeException("Command rc=" + rc + ": " + cmdline + "\n" + getOutput());
+			throw new UnexpectedReturnCodeException(rc, cmdline.toString(), getOutput());
 		}
 		return getOutput();
 	}
@@ -245,6 +260,32 @@ public final class Proc {
 	public Proc setWorkingDir(File workingDir) {
 		this.workingDir = workingDir;
 		return this;
+	}
+
+	public static class UnexpectedReturnCodeException extends RuntimeException {
+
+		private int rc;
+		private String cmdline;
+		private String output;
+
+		public UnexpectedReturnCodeException(int rc, String cmdline, String output) {
+			super("Command rc=" + rc + ": " + cmdline + "\n" + output);
+			this.rc = rc;
+			this.cmdline = cmdline;
+			this.output = output;
+		}
+
+		public int getRc() {
+			return rc;
+		}
+
+		public String getOutput() {
+			return output;
+		}
+
+		public String getCmdline() {
+			return cmdline;
+		}
 	}
 
 }

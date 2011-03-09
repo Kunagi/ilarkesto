@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package ilarkesto.gwt.client;
 
 import ilarkesto.core.base.Str;
@@ -51,7 +65,7 @@ public abstract class AViewEditWidget extends AWidget {
 	}
 
 	@Override
-	protected final void onUpdate() {
+	protected void onUpdate() {
 		if (isViewMode()) {
 			updateViewer();
 		} else {
@@ -90,6 +104,10 @@ public abstract class AViewEditWidget extends AWidget {
 	}
 
 	public void switchToViewMode() {
+		switchToViewMode(true);
+	}
+
+	public void switchToViewMode(boolean update) {
 		if (isViewMode()) return;
 		Log.DEBUG("Switching to view mode: " + toString());
 		viewMode = true;
@@ -97,7 +115,7 @@ public abstract class AViewEditWidget extends AWidget {
 		if (currentEditor == this) currentEditor = null;
 		if (modeSwitchHandler != null) modeSwitchHandler.onViewerActivated(this);
 		if (globalModeSwitchHandler != null) globalModeSwitchHandler.onViewerActivated(this);
-		update();
+		if (update) update();
 	}
 
 	protected final boolean submitEditor() {

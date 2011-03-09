@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package ilarkesto.integration.jdom;
 
 import ilarkesto.core.logging.Log;
@@ -14,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -78,6 +93,14 @@ public abstract class JDom {
 		return getChildAttributeValue(doc.getRootElement(), childName, attributeName);
 	}
 
+	public static Document createDocument(File file) {
+		try {
+			return createDocument(file.toURI().toURL().toString());
+		} catch (MalformedURLException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	public static Document createDocument(String xmlData) {
 		SAXBuilder builder = new SAXBuilder(false);
 		builder.setExpandEntities(false);
@@ -91,7 +114,7 @@ public abstract class JDom {
 	}
 
 	public static Document createDocumentFromUrl(final String url) {
-		log.debug("Downloading:", url);
+		log.debug("Loading from URL:", url);
 		try {
 			SAXBuilder builder = new SAXBuilder(false);
 			builder.setExpandEntities(false);
